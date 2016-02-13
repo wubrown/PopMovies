@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="E:\AA-TeamHis\Git15\Android\projects\PopMovies\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\21.0.2\jars\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="7ae2d38807a43b2f2185ff4089a92c790b579e54">
+        <dex dex="E:\AA-TeamHis\Git15\Android\projects\PopMovies\app\build\intermediates\pre-dexed\debug\classes-59e35d8f675489f55511da4bce0eea20f717e6a9.jar" />
+    </item>
+    <item
+        jar="E:\AA-TeamHis\Git15\Android\projects\PopMovies\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.2\jars\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="d1bf02de1c56d942e7a9d093b8610ba1ef4128e3">
+        <dex dex="E:\AA-TeamHis\Git15\Android\projects\PopMovies\app\build\intermediates\pre-dexed\debug\classes-19cef7ba58aea11f14cc59063871c451b8659421.jar" />
+    </item>
+    <item
+        jar="C:\Users\Bill\.gradle\caches\modules-2\files-2.1\com.squareup.picasso\picasso\2.5.2\7446d06ec8d4f7ffcc53f1da37c95f200dcb9387\picasso-2.5.2.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="7446d06ec8d4f7ffcc53f1da37c95f200dcb9387">
+        <dex dex="E:\AA-TeamHis\Git15\Android\projects\PopMovies\app\build\intermediates\pre-dexed\debug\picasso-2.5.2-bc94783b234a8db3c8a9957cdbd5e312abf20e55.jar" />
+    </item>
+    <item
+        jar="C:\Users\Bill\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\21.0.2\support-annotations-21.0.2.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="99373741f99a0556ee293c41e8faa1ca3ae8a4e6">
+        <dex dex="E:\AA-TeamHis\Git15\Android\projects\PopMovies\app\build\intermediates\pre-dexed\debug\support-annotations-21.0.2-e13263856dcfe91b2962b5f2199637d64bb7fc83.jar" />
+    </item>
+    <item
+        jar="E:\AA-TeamHis\Git15\Android\projects\PopMovies\app\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.2\jars\libs\internal_impl-21.0.2.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="962e8b12569c56dbdcf8367eb4eac8bb129cd18f">
+        <dex dex="E:\AA-TeamHis\Git15\Android\projects\PopMovies\app\build\intermediates\pre-dexed\debug\internal_impl-21.0.2-e22cb9ca328ec71e4c7272531f8d78ea79d5d7ba.jar" />
+    </item>
+
+</items>
