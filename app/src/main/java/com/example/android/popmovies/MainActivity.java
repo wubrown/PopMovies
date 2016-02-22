@@ -1,9 +1,19 @@
 package com.example.android.popmovies;
-
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+/*
+ * Project 1 - Android Developer Nanodegree - Popular Movies 1
+ * By William U. Brown - student: wubrown@gmail.com
+ *
+ * MainActivity displays a Grid of Popular or Highly Rated Movie posters
+ * obtained from The Movie Db .org (Users will need to supply their own API key).
+ * On click /selection a separate detail activity will give more information on the movie.
+ * Users can change sort order from the settings menu.
+ */
+
 
 public class MainActivity extends ActionBarActivity {
 

@@ -14,8 +14,8 @@
         android:id="@+id/gridview_movie"
         android:columnWidth="185dp"
         android:numColumns="auto_fit"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
-        android:gravity="center"/>
+        android:verticalSpacing="0dp"
+        android:horizontalSpacing="0dp"
+        android:stretchMode="columnWidth"/>
 
 </FrameLayout>

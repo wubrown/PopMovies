@@ -1,8 +1,10 @@
 package com.example.android.popmovies;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,11 +12,27 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 /**
  * A Fragment containing a GridView of movie options.
  */
 public class MainActivityFragment extends Fragment {
- //   private ArrayAdapter<String> mMovieAdapter;
+
+// URL Snippets from TMDb.org Discover API Examples to be used in Project 1
+    private static final String URL_PREFIX = "http://api.themoviedb.org/3";
+    private static final String TMDB_API_KEY = "Insert Your API Key Here";
+    private static final String URL_MOST_POPULAR = "/discover/movie?sort_by=popularity.desc";
+    private static final String URL_HIGHEST_RATED =
+            "/discover/movie/?certification_country=US&certification=R&sort_by=vote_average.desc";
+
     public MainActivityFragment() {
     }
 
@@ -22,29 +40,12 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
- /*       String[] data = {
-                "sample_0.jpg",
-                "sample_1.jpg",
-                "sample_2.jpg",
-                "sample_3.jpg",
-                "sample_4.jpg",
-                "sample_5.jpg",
-                "sample_6.jpg",
-                "sample_7.jpg"
-        };
-        List<String> movieOptions = new ArrayList<String>(Arrays.asList(data));
-
-        mMovieAdapter = new ArrayAdapter<String>(
-                getActivity(),
-                R.layout.grid_item_movie,
-                R.id.grid_item_movie_imageview,
-                movieOptions); */
         GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movie);
         gridView.setAdapter(new ImageAdapter(getActivity()));
         return rootView;
     }
 /**
- * ImageAdapter from Grid View API on android.com
+ * ImageAdapter from Grid View API on android.com - Used for testing
  */
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
@@ -65,21 +66,17 @@ public class ImageAdapter extends BaseAdapter {
         return 0;
     }
 
-    // create a new ImageView for each item referenced by the Adapter
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
-        if (convertView == null) {
+    // create a new ImageView for each item referenced by the Adapter using Picasso
+    @Override public View getView(int position, View convertView, ViewGroup parent) {
+        ImageView view = (ImageView) convertView;
+        if (view == null) {
             // if it's not recycled, initialize some attributes
-            imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(170, 170));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(8, 8, 8, 8);
-        } else {
-            imageView = (ImageView) convertView;
-        }
+            view = new ImageView(mContext);
 
-        imageView.setImageResource(mThumbIds[position]);
-        return imageView;
+        }
+        Object imageId = getItem(position);
+        Picasso.with(mContext).load(mThumbIds[position]).into(view);
+        return view;
     }
 
     // references to our images
@@ -97,4 +94,59 @@ public class ImageAdapter extends BaseAdapter {
             R.drawable.sample_6, R.drawable.sample_7
     };
 }
+    public class FetchMovieTask extends AsyncTask<String,Void,Void> {
+
+        private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
+        @Override
+        protected Void doInBackground(String... params){ //params is an Array of type String
+            // Modelled after Sunshine v2 example
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+            String moviesJsonStr = null; // raw JSON response string
+            String sortOrder= params[0];
+
+            try {
+                // Construct the query string for TMDb.org
+                String apiKey = "&api_key=" + TMDB_API_KEY;  //need to create & ignore
+                String urlStr = URL_PREFIX + sortOrder + apiKey;
+                URL url = new URL(urlStr);
+
+                // Create the request to TMDb and open the connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read input string
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) return null;
+
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line + "\n");
+                }
+                if (buffer.length() == 0) return null;
+
+                moviesJsonStr = buffer.toString();
+            }  catch (IOException e) {
+                Log.e(LOG_TAG, "Error ", e);
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error closing stream", e);
+                    }
+                }
+            }
+            return null;
+
+        }
+    }
 }
