@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -29,6 +32,7 @@ public class MainActivityFragment extends Fragment {
 // URL Snippets from TMDb.org Discover API Examples to be used in Project 1
     private static final String URL_PREFIX = "http://api.themoviedb.org/3";
     private static final String TMDB_API_KEY = "Insert Your API Key Here";
+//    private static final String TMDB_API_KEY = "-";
     private static final String URL_MOST_POPULAR = "/discover/movie?sort_by=popularity.desc";
     private static final String URL_HIGHEST_RATED =
             "/discover/movie/?certification_country=US&certification=R&sort_by=vote_average.desc";
@@ -37,6 +41,27 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.menu_main_fragment, menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+        if(id == R.id.action_refresh){
+            FetchMovieTask movieTask = new FetchMovieTask();
+            movieTask.execute(URL_MOST_POPULAR);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -44,7 +69,8 @@ public class MainActivityFragment extends Fragment {
         gridView.setAdapter(new ImageAdapter(getActivity()));
         return rootView;
     }
-/**
+
+    /**
  * ImageAdapter from Grid View API on android.com - Used for testing
  */
 public class ImageAdapter extends BaseAdapter {
@@ -130,6 +156,7 @@ public class ImageAdapter extends BaseAdapter {
                 if (buffer.length() == 0) return null;
 
                 moviesJsonStr = buffer.toString();
+                Log.v(LOG_TAG,"Movie JSON String: " + moviesJsonStr);
             }  catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 return null;
