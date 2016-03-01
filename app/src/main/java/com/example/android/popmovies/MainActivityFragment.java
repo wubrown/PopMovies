@@ -2,8 +2,10 @@ package com.example.android.popmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +39,7 @@ import java.util.List;
  * A Fragment containing a GridView of movie options.
  */
 public class MainActivityFragment extends Fragment {
+
     private ImageAdapter mMovieAdapter;
     private String[] thumbs = {
             "http://image.tmdb.org/t/p/w185/jjBgi2r5cRt36xF6iNUEhzscEcb.jpg",
@@ -71,8 +74,8 @@ public class MainActivityFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
         if(id == R.id.action_refresh){
-            FetchMovieTask movieTask = new FetchMovieTask();
-            movieTask.execute(URL_MOST_POPULAR);
+            updateMovies();
+
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -97,6 +100,23 @@ public class MainActivityFragment extends Fragment {
         return rootView;
     }
 
+    private void updateMovies(){
+        FetchMovieTask movieTask = new FetchMovieTask();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String order =prefs.getString(getString(R.string.pref_sort_key),
+                getString(R.string.pref_sort_default));
+        if(order.equals("popular")){
+            movieTask.execute(URL_MOST_POPULAR);
+        }
+        else {
+            movieTask.execute(URL_HIGHEST_RATED);
+        }
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateMovies();
+    }
     /**
  * ImageAdapter from Grid View API on android.com - Used for testing
  */
@@ -126,13 +146,11 @@ public class ImageAdapter extends BaseAdapter {
         if (view == null) {
             // if it's not recycled, initialize some attributes
             view = new ImageView(mContext);
-
         }
         String imageId = getItem(position);
         Picasso.with(mContext).load(imageId).into(view);
         return view;
     }
-
 }
 /* Container class for individual movie objects with fields having been
  * extracted from JSON objects retrieved from THDb
