@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:id="@+id/gridview_movie"
         android:columnWidth="185dp"
-        android:numColumns="auto_fit"
+        android:numColumns="2"
         android:verticalSpacing="0dp"
         android:horizontalSpacing="0dp"
         android:stretchMode="columnWidth"/>

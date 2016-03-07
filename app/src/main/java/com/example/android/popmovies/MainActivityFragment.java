@@ -9,9 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -46,6 +43,7 @@ public class MainActivityFragment extends Fragment {
             "http://image.tmdb.org/t/p/w185/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
     };
     private ArrayList<String> mThumbs = new ArrayList<String>(Arrays.asList(thumbs));
+    private Movies mMovies;
 // URL Snippets from TMDb.org Discover API Examples to be used in Project 1
     private static final String URL_PREFIX = "http://api.themoviedb.org/3";
 //    private static final String TMDB_API_KEY = "Insert Your API Key Here";
@@ -62,24 +60,9 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.menu_main_fragment, menu);
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        int id = item.getItemId();
-        if(id == R.id.action_refresh){
-            updateMovies();
 
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -91,8 +74,10 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
               //  String movie = mMovieAdapter.getItem(position);
+                Movie movie = mMovies.getMovie(position);
                 Intent intent = new Intent(getActivity(),DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT,"" + position);
+                        .putExtra(Intent.EXTRA_TEXT,movie.toString());
+                intent.putExtra(Intent.EXTRA_STREAM,movie.getPosterUri());
                 startActivity(intent);
             }
         });
@@ -180,6 +165,9 @@ public class ImageAdapter extends BaseAdapter {
             str.append("Release Date: " + release + NEW_LINE);
             return str.toString();
         }
+        public String getPosterUri(){
+            return IMAGE_URL_PREFIX + THUMBNAIL_SIZE + thumbnail;
+        }
     }
 /* Collection of Movie objects selected for user review.
  * Methods added to facilitate specific activity needs
@@ -230,11 +218,11 @@ public class ImageAdapter extends BaseAdapter {
         }
 
     }
-    public class FetchMovieTask extends AsyncTask<String,Void,String[]> {
+    public class FetchMovieTask extends AsyncTask<String,Void,Movies> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
         @Override
-        protected String[] doInBackground(String... params) { //params is an Array of type String
+        protected Movies doInBackground(String... params) { //params is an Array of type String
             // Modelled after Sunshine v2 example
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
@@ -288,7 +276,7 @@ public class ImageAdapter extends BaseAdapter {
 
             try {
                 movies = new Movies(moviesJsonStr);
-                return movies.getAllThumbnails();
+                return movies;
             } catch (JSONException e){
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
@@ -298,13 +286,14 @@ public class ImageAdapter extends BaseAdapter {
         }
 
         @Override
-        protected void onPostExecute(String[] result) throws NullPointerException {
+        protected void onPostExecute(Movies result) throws NullPointerException {
             if (result != null) {
                 mThumbs.clear();
                 mMovieAdapter.notifyDataSetChanged();
-                for (String movieUrl : result) {
+                for (String movieUrl : result.getAllThumbnails()) {
                     mThumbs.add(movieUrl);
                 }
+                mMovies = result;
             }
         }
     }
