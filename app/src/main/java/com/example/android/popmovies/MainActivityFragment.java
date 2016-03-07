@@ -170,6 +170,16 @@ public class ImageAdapter extends BaseAdapter {
             this.rating = rating;
             this.release = release;
         }
+        // Build the EXTRA.TEXT to be sent to detail activity
+        @Override public String toString(){
+            StringBuilder str = new StringBuilder();
+            String NEW_LINE = System.getProperty("line.separator");
+            str.append("Title: " + title + NEW_LINE);
+            str.append("Plot: " + overview + NEW_LINE);
+            str.append("User Rating: " + rating + NEW_LINE);
+            str.append("Release Date: " + release + NEW_LINE);
+            return str.toString();
+        }
     }
 /* Collection of Movie objects selected for user review.
  * Methods added to facilitate specific activity needs
@@ -214,6 +224,9 @@ public class ImageAdapter extends BaseAdapter {
                 Log.v("getAllThumbnails","Thumbnails Array: " + thumbs[i]);
             }
             return thumbs;
+        }
+        public Movie getMovie(int index){
+            return mMovies.get(index);
         }
 
     }

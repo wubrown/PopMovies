@@ -25,7 +25,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 public class DetailActivity extends ActionBarActivity {
 
@@ -81,7 +84,10 @@ public class DetailActivity extends ActionBarActivity {
             if (intent != null && intent.hasExtra((Intent.EXTRA_TEXT))){
                 String position = intent.getStringExtra(Intent.EXTRA_TEXT);
                 ((TextView) rootView.findViewById(R.id.detail_text)).setText("position= " + position);
-
+                ImageView image = (ImageView) rootView.findViewById(R.id.detail_image);
+                Picasso.with(getActivity())
+                        .load("http://image.tmdb.org/t/p/w185/aJHZbS8vpTrq2tQZv6bXmgLjz2P.jpg")
+                        .into(image);
             }
 
             return rootView;
