@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 package com.example.android.popmovies;
 
 import android.content.Context;
@@ -29,20 +46,15 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * A Fragment containing a GridView of movie options.
+ * Create A Fragment containing a GridView of sorted movie options.
  */
 public class MainActivityFragment extends Fragment {
 
     private ImageAdapter mMovieAdapter;
-    private String[] thumbs = {
-            "http://image.tmdb.org/t/p/w185/jjBgi2r5cRt36xF6iNUEhzscEcb.jpg",
-            "http://image.tmdb.org/t/p/w185/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"
-    };
-    private ArrayList<String> mThumbs = new ArrayList<String>(Arrays.asList(thumbs));
+    private ArrayList<String> mThumbs = new ArrayList<String>();
     private Movies mMovies;
 // URL Snippets from TMDb.org Discover API Examples to be used in Project 1
     private static final String URL_PREFIX = "http://api.themoviedb.org/3";
@@ -73,11 +85,10 @@ public class MainActivityFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-              //  String movie = mMovieAdapter.getItem(position);
                 Movie movie = mMovies.getMovie(position);
                 Intent intent = new Intent(getActivity(),DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT,movie.toString());
-                intent.putExtra(Intent.EXTRA_STREAM,movie.getPosterUri());
+                        .putExtra(Intent.EXTRA_TEXT,movie.toString()); // Send formatted description
+                intent.putExtra(Intent.EXTRA_STREAM,movie.getPosterUri()); // Send poster URL w/prefix
                 startActivity(intent);
             }
         });
@@ -85,6 +96,9 @@ public class MainActivityFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Update main movie selection grid on start of change in sort order
+     */
     private void updateMovies(){
         FetchMovieTask movieTask = new FetchMovieTask();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -102,8 +116,8 @@ public class MainActivityFragment extends Fragment {
         super.onStart();
         updateMovies();
     }
-    /**
- * ImageAdapter from Grid View API on android.com - Used for testing
+ /**
+ * ImageAdapter modeled after Grid View API on android.com - Used for testing
  */
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
@@ -129,7 +143,6 @@ public class ImageAdapter extends BaseAdapter {
         ImageView view = (ImageView) convertView;
 
         if (view == null) {
-            // if it's not recycled, initialize some attributes
             view = new ImageView(mContext);
         }
         String imageId = getItem(position);
@@ -159,7 +172,7 @@ public class ImageAdapter extends BaseAdapter {
         @Override public String toString(){
             StringBuilder str = new StringBuilder();
             String NEW_LINE = System.getProperty("line.separator");
-            str.append("Title: " + title + NEW_LINE);
+            str.append(NEW_LINE+ "Title: " + title + NEW_LINE);
             str.append("Plot: " + overview + NEW_LINE);
             str.append("User Rating: " + rating + NEW_LINE);
             str.append("Release Date: " + release + NEW_LINE);
@@ -169,7 +182,7 @@ public class ImageAdapter extends BaseAdapter {
             return IMAGE_URL_PREFIX + THUMBNAIL_SIZE + thumbnail;
         }
     }
-/* Collection of Movie objects selected for user review.
+/** Collection of Movie objects selected for user review.
  * Methods added to facilitate specific activity needs
  */
     public class Movies {
@@ -205,11 +218,17 @@ public class ImageAdapter extends BaseAdapter {
                 mMovies.add(movie);
             }
         }
-        public String[] getAllThumbnails(){
+
+    /**
+     *  Returns an array of full poster urls for the current set of movies
+     *  being displayed primarily for use with the ImageAdapter supporting the GridView
+      * @return an array of full poster urls for the current set of movies
+     */
+    public String[] getAllThumbnails(){
             String [] thumbs = new String[mMovies.size()];
             for (int i = 0; i < mMovies.size(); i++) {
                 thumbs[i] = IMAGE_URL_PREFIX + THUMBNAIL_SIZE + mMovies.get(i).thumbnail;
-                Log.v("getAllThumbnails","Thumbnails Array: " + thumbs[i]);
+//                Log.v("getAllThumbnails","Thumbnails Array: " + thumbs[i]);
             }
             return thumbs;
         }
@@ -218,6 +237,12 @@ public class ImageAdapter extends BaseAdapter {
         }
 
     }
+
+    /**
+     * Provides asynchronous communication with The Movie DB service
+     * When successful returning a Movies object containing the currently selected Movies
+     */
+
     public class FetchMovieTask extends AsyncTask<String,Void,Movies> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
@@ -285,6 +310,13 @@ public class ImageAdapter extends BaseAdapter {
         return null;
         }
 
+        /**
+         * Sends results back to the main UI thread on success:
+         * mThumbs is updated to reflect the new movie set
+         * mMovies is set equal to the new movie set
+         * @param result is the Movies object containing currently selected movies
+         * @throws NullPointerException
+         */
         @Override
         protected void onPostExecute(Movies result) throws NullPointerException {
             if (result != null) {
